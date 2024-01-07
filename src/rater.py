@@ -7,13 +7,13 @@ This module is designed to manage and validate JSON files,
 specifically for airport data.
 ##############################################################################
 """
-
 import os
 
 class JsonAirport:
     FORMAT = "json"
     
     def __init__(self, json_path):
+        assert isinstance(json_path, str)
         self.json_path = json_path
         self.validateJson()
 
