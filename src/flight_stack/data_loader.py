@@ -15,18 +15,31 @@ from dotenv import load_dotenv
 
 class FlightDataIngestion:
     def __init__(self):
-        self.log_file = 'flight_data_fetch.log'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))  
+
+        # Define the 'log' directory outside src (directly under Project)
+        log_dir = os.path.join(project_root, 'logs')
+
+        # Create the 'log' directory if it does not exist
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+
+        # Define the log file path inside the 'log' directory
+        self.log_file = os.path.join(log_dir, 'flight_data_fetch.log')
+
+        # Configure logging: write logs to the file and also display them in the console
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(levellevel)s - %(message)s',
+            format='%(asctime)s - %(levelname)s - %(message)s',
             handlers=[
-                logging.FileHandler(self.log_file),
-                logging.StreamHandler()
+                logging.FileHandler(self.log_file),  # Log to file
+                logging.StreamHandler()              # Log to console
             ]
         )
         self.logger = logging.getLogger(__name__)
         load_dotenv()
-        self.api_key = os.getenv('m_API_KEY')
+        self.api_key = os.getenv('API_KEY')
         if not self.api_key:
             self.logger.error("API_KEY not found. Please ensure the .env file is present and contains the API_KEY")
             raise ValueError("API_KEY not found. Please ensure the .env file is present and contains the API_KEY")
@@ -112,7 +125,8 @@ class FlightDataIngestion:
         try:
             with open(file_path, 'w') as json_file:
                 json.dump(flight_data, json_file, indent=4)
-            self.logger.info(f"Flight data saved successfully in {file_path}")
+            # Log only the filename instead of the full path
+            self.logger.info(f"Flight data saved successfully in {filename}")
         except Exception as e:
             self.logger.error(f"Error saving flight data: {e}")
 
